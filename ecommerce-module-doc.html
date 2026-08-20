@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Commerce Module — WhatsWay Docs</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --accent: #0F8B7D;
+    --accent-dark: #0B6B60;
+    --accent-tint: #E6F5F3;
+    --ink: #16181D;
+    --ink-soft: #4B5262;
+    --ink-faint: #0d1d4a;
+    --line: #E6E8EC;
+    --line-soft: #EEF0F3;
+    --bg: #FFFFFF;
+    --bg-sidebar: #FBFBFC;
+    --bg-code: #F6F7F9;
+    --warn: #B45309;
+    --warn-tint: #FEF3E2;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    font-size: 15.5px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+  }
+
+  .topbar .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 700;
+    font-size: 14.5px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .topbar .brand .mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .topbar .brand .mark svg { width: 12px; height: 12px; }
+
+  .topbar .crumb { color: var(--ink-faint); font-weight: 500; }
+
+  .topbar .right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+
+  .topbar .pill {
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: var(--accent-tint);
+    color: var(--accent-dark);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr) 220px;
+    max-width: 1360px;
+    margin: 0 auto;
+  }
+
+  .sidebar {
+    border-right: 1px solid var(--line);
+    background: var(--bg-sidebar);
+    padding: 28px 18px;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+  }
+
+  .sidebar .group-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    padding: 0 10px;
+    margin: 18px 0 6px;
+  }
+
+  .sidebar .group-label:first-child { margin-top: 0; }
+
+  .sidebar a.nav-link {
+    display: block;
+    padding: 7px 10px;
+    border-radius: 7px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-bottom: 1px;
+    transition: background 0.12s, color 0.12s;
+  }
+
+  .sidebar a.nav-link:hover { background: var(--line-soft); color: var(--ink); }
+
+  .sidebar a.nav-link.active {
+    background: var(--accent-tint);
+    color: var(--accent-dark);
+    font-weight: 600;
+  }
+
+  main { padding: 44px 56px 120px; min-width: 0; }
+
+  .doc-header { margin-bottom: 40px; }
+
+  .doc-header .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--accent-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+
+  .doc-header h1 {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px 0;
+    color: var(--ink);
+  }
+
+  .doc-header .lede {
+    font-size: 16.5px;
+    color: var(--ink-soft);
+    max-width: 640px;
+    margin: 0;
+  }
+
+  section { margin-bottom: 56px; scroll-margin-top: 76px; }
+
+  h2.h-section {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 0 0 6px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  h2.h-section .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-faint);
+  }
+
+  .section-rule { height: 1px; background: var(--line); margin: 14px 0 24px 0; }
+
+  h3.h-sub { font-size: 16px; font-weight: 700; color: var(--ink); margin: 26px 0 10px 0; }
+
+  h4.h-mini {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 18px 0 8px 0;
+  }
+
+  p { color: var(--ink-soft); margin: 0 0 14px 0; }
+
+  ul.clean-list { margin: 0 0 16px 0; padding-left: 0; list-style: none; }
+
+  ul.clean-list li {
+    position: relative;
+    padding-left: 22px;
+    margin-bottom: 8px;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  ul.clean-list li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 9px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  ol.steps { margin: 0 0 16px 0; padding-left: 0; list-style: none; counter-reset: step; }
+
+  ol.steps li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 34px;
+    margin-bottom: 12px;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  ol.steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: -1px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--accent-tint);
+    color: var(--accent-dark);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .platform-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+
+  .platform-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; background: var(--bg); }
+
+  .platform-card .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--accent-dark);
+    background: var(--accent-tint);
+    padding: 4px 10px;
+    border-radius: 100px;
+    margin-bottom: 12px;
+  }
+
+  .platform-card .tag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .callout {
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 18px 0;
+    font-size: 14.5px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .callout.note { background: var(--accent-tint); border: 1px solid #C9E9E4; color: var(--accent-dark); }
+  .callout.warn { background: var(--warn-tint); border: 1px solid #F5DBAF; color: var(--warn); }
+  .callout .icon { flex-shrink: 0; margin-top: 1px; }
+  .callout p { margin: 0; color: inherit; }
+
+  .flow { border: 1px solid var(--line); border-radius: 12px; padding: 28px 32px; margin: 20px 0; background: var(--bg-code); }
+
+  .flow-row { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+
+  .flow-row .step-index {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink-faint);
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .flow-row .step-box {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .flow-connector { padding-left: 34px; color: var(--ink-faint); font-size: 13px; margin: 2px 0; }
+  .flow-row:last-child .step-box { background: var(--accent); color: white; border-color: var(--accent); }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 7px;
+    background: var(--bg-code);
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  table.data-table th {
+    background: var(--bg-code);
+    text-align: left;
+    padding: 11px 16px;
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid var(--line);
+  }
+
+  table.data-table td { padding: 13px 16px; border-bottom: 1px solid var(--line-soft); color: var(--ink-soft); }
+  table.data-table tr:last-child td { border-bottom: none; }
+  table.data-table td.issue { color: var(--ink); font-weight: 600; }
+
+  .rail { padding: 44px 0 0 20px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+
+  .rail .rail-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+  }
+
+  .rail a {
+    display: block;
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 5px 0;
+    border-left: 2px solid transparent;
+    padding-left: 12px;
+    margin-left: -13px;
+  }
+
+  .rail a:hover { color: var(--accent-dark); }
+  .rail a.active { color: var(--accent-dark); border-left-color: var(--accent); font-weight: 600; }
+
+  .doc-footer-nav {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 60px;
+  }
+
+  .doc-footer-nav a { text-decoration: none; color: var(--ink-soft); font-size: 13.5px; font-weight: 600; }
+  .doc-footer-nav a:hover { color: var(--accent-dark); }
+  .doc-footer-nav .label { display: block; font-size: 11px; color: var(--ink-faint); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em;}
+
+  @media (max-width: 1100px) {
+    .shell { grid-template-columns: 220px 1fr; }
+    .rail { display: none; }
+  }
+
+  @media (max-width: 780px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    main { padding: 32px 20px 100px; }
+    .platform-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.3c1.4.8 3.1 1.3 4.8 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2z" fill="white"/></svg>
+      </span>
+      WhatsWay Docs
+      <span class="crumb">/ E-Commerce Module</span>
+    </div>
+    <div class="right">
+      <span class="pill">v1.0</span>
+    </div>
+  </div>
+
+  <div class="shell">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="group-label">Getting Started</div>
+      <a class="nav-link" href="#overview">Overview</a>
+      <a class="nav-link" href="#store-connection">Store Connection</a>
+
+      <div class="group-label">Core Concepts</div>
+      <a class="nav-link" href="#customer-sync">Customer Synchronization</a>
+      <a class="nav-link" href="#abandoned-cart">Abandoned Cart Recovery</a>
+      <a class="nav-link" href="#automation">Automation</a>
+
+      <div class="group-label">Reference</div>
+      <a class="nav-link" href="#api-features">API Features</a>
+      <a class="nav-link" href="#troubleshooting">Troubleshooting</a>
+      <a class="nav-link" href="#conclusion">Conclusion</a>
+    </aside>
+
+    <main>
+
+      <div class="doc-header">
+        <div class="eyebrow">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          E-Commerce Module
+        </div>
+        <h1>Shopify &amp; WooCommerce Integration</h1>
+        <p class="lede">Connect your store to WhatsWay to automate customer communication, recover abandoned carts, and trigger WhatsApp messages from order events.</p>
+      </div>
+
+      <section id="overview">
+        <h2 class="h-section"><span class="num">01</span> Overview</h2>
+        <div class="section-rule"></div>
+        <p>The E-Commerce Module enables users to connect their online stores with WhatsWay and automate customer communication through WhatsApp. It supports customer synchronization, abandoned cart recovery, and order-based automation.</p>
+
+        <h4 class="h-mini">Supported Platforms</h4>
+        <div class="chip-row">
+          <span class="chip">shopify</span>
+          <span class="chip">woocommerce</span>
+        </div>
+
+        <h4 class="h-mini">Key Features</h4>
+        <ul class="clean-list">
+          <!-- <li>Connect online stores</li>
+          <li>Customer synchronization</li>
+          <li>Abandoned cart recovery</li>
+          <li>Order automation</li>
+          <li>WhatsApp messaging</li> -->
+
+ <li>Shopify &amp; WooCommerce Integration</li>
+<li>Multi-Store Support</li>
+<li>WhatsApp Order Notifications</li>
+<li>COD Verification System</li>
+<li>Abandoned Cart Recovery</li>
+<li>Customer Synchronization</li>
+<li>Order Automation</li>
+<li>Automatic Webhook Registration</li>
+<li>Analytics Dashboard</li>
+        </ul>
+      </section>
+
+      <section id="store-connection">
+        <h2 class="h-section"><span class="num">02</span> Store Connection</h2>
+        <div class="section-rule"></div>
+
+        <div class="platform-grid">
+          <div class="platform-card">
+            <div class="tag"><span class="dot"></span>Shopify</div>
+            <p>Shopify uses OAuth. The Superadmin configures the Shopify app credentials once, and users only enter their store URL to connect.</p>
+
+            <h4 class="h-mini">Superadmin Settings</h4>
+            <ol class="steps">
+              <li>Open <strong style="color:var(--ink)">Superadmin → Settings → E-Commerce → Shopify</strong></li>
+              <li>Enter the Shopify <strong style="color:var(--ink)">Client ID</strong> and <strong style="color:var(--ink)">Client Secret</strong></li>
+              <li>Enter the <strong style="color:var(--ink)">App URL</strong> and <strong style="color:var(--ink)">Callback URL</strong></li>
+              <li>Enter the <strong style="color:var(--ink)">Webhook URL</strong></li>
+              <li>Configure scopes: <span class="mono">read_products, read_orders, read_customers, read_inventory</span></li>
+              <li>Click <strong style="color:var(--ink)">Save Settings</strong></li>
+            </ol>
+
+            <h4 class="h-mini">Shopify App Configuration</h4>
+            <ol class="steps">
+              <li>Open the Shopify app configuration in the Shopify Partner dashboard</li>
+              <li>Set the App URL to the same App URL configured in WhatsWay</li>
+              <li>Add the WhatsWay Shopify Callback URL as the allowed redirect URL</li>
+              <li>Save the Shopify app configuration</li>
+            </ol>
+
+            <h4 class="h-mini">Webhook Events</h4>
+            <ul class="clean-list">
+              <li><span class="mono">orders/create</span></li>
+              <li><span class="mono">orders/updated</span></li>
+              <li><span class="mono">orders/fulfilled</span></li>
+              <li><span class="mono">customers/create</span></li>
+              <li><span class="mono">checkouts/create</span></li>
+              <li><span class="mono">checkouts/update</span></li>
+              <li><span class="mono">products/update</span> — optional</li>
+            </ul>
+
+            <div class="callout note">
+              <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <p>Shopify does not provide a direct <span class="mono">cart.updated</span> webhook. Checkout events are used for abandoned cart tracking.</p>
+            </div>
+
+            <h4 class="h-mini">User Connection Process</h4>
+            <ol class="steps">
+              <li>Open <strong style="color:var(--ink)">E-Commerce → Stores → Shopify</strong></li>
+              <li>Enter the Shopify Store URL</li>
+              <li>Click <strong style="color:var(--ink)">Connect Store</strong></li>
+              <li>Authorize the WhatsWay application in Shopify</li>
+              <li>The store connects and Shopify webhooks are registered automatically</li>
+              <li>Use <strong style="color:var(--ink)">Sync Now</strong> to synchronize customers when required</li>
+            </ol>
+          </div>
+
+          <div class="platform-card">
+            <div class="tag"><span class="dot"></span>WooCommerce</div>
+            <p>Connect using REST API credentials generated from your WordPress admin.</p>
+            <h4 class="h-mini">Required Details</h4>
+            <ul class="clean-list">
+              <li>Store URL</li>
+              <li>Consumer Key</li>
+              <li>Consumer Secret</li>
+            </ul>
+            <h4 class="h-mini">After Connecting</h4>
+            <ul class="clean-list">
+              <li>Existing customers sync automatically</li>
+              <li>Connector Plugin becomes configurable</li>
+              <li>Webhooks enable automatically</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout note">
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <p>A channel can have one store connected per platform — one Shopify store and one WooCommerce store simultaneously.</p>
+        </div>
+      </section>
+
+      <section id="customer-sync">
+        <h2 class="h-section"><span class="num">03</span> Customer Synchronization</h2>
+        <div class="section-rule"></div>
+        <p>The module supports both automatic and manual customer synchronization.</p>
+        <ul class="clean-list">
+          <li>Automatic customer sync during store connection</li>
+          <li>Manual <strong style="color:var(--ink)">Sync Now</strong> option</li>
+          <li>Duplicate contact prevention</li>
+          <li>Contact update if customer information changes</li>
+        </ul>
+      </section>
+
+      <section id="abandoned-cart">
+        <h2 class="h-section"><span class="num">04</span> Abandoned Cart Recovery</h2>
+        <div class="section-rule"></div>
+        <p>The system automatically tracks abandoned carts and schedules WhatsApp reminders.</p>
+
+        <div class="flow">
+          <div class="flow-row"><span class="step-index">01</span><div class="step-box">Customer adds products</div></div>
+          <div class="flow-connector">↓</div>
+          <div class="flow-row"><span class="step-index">02</span><div class="step-box">Checkout started</div></div>
+          <div class="flow-connector">↓</div>
+          <div class="flow-row"><span class="step-index">03</span><div class="step-box">Cart abandoned</div></div>
+          <div class="flow-connector">↓</div>
+          <div class="flow-row"><span class="step-index">04</span><div class="step-box">Reminder scheduled</div></div>
+          <div class="flow-connector">↓</div>
+          <div class="flow-row"><span class="step-index">05</span><div class="step-box">WhatsApp reminder sent</div></div>
+          <div class="flow-connector">↓</div>
+          <div class="flow-row"><span class="step-index">06</span><div class="step-box">Customer completes order</div></div>
+          <div class="flow-connector">↓</div>
+          <div class="flow-row"><span class="step-index">07</span><div class="step-box">Marked as completed</div></div>
+        </div>
+      </section>
+
+
+
+      <section id="cod-verification">
+  <h2 class="h-section">
+    <span class="num">05</span>
+    COD Order Verification
+  </h2>
+
+  <div class="section-rule"></div>
+
+  <p>
+    WhatsWay automatically detects Cash on Delivery (COD) orders and verifies
+    them through WhatsApp before processing. Customers can confirm or cancel
+    their order with a single tap, helping reduce fake COD orders and improve
+    delivery success rates.
+  </p>
+
+  <div class="platform-grid">
+
+    <div class="platform-card">
+      <div class="tag">
+        <span class="dot"></span>
+        Verification Features
+      </div>
+
+      <ul class="clean-list">
+        <li>Automatic COD Order Detection</li>
+        <li>WhatsApp COD Verification</li>
+        <li>One-Tap Order Confirmation</li>
+        <li>One-Tap Order Cancellation</li>
+        <li>Interactive WhatsApp Buttons</li>
+      </ul>
+    </div>
+
+    <div class="platform-card">
+      <div class="tag">
+        <span class="dot"></span>
+        Platform Integration
+      </div>
+
+      <ul class="clean-list">
+        <li>Automatic Shopify Order Updates</li>
+        <li>Automatic WooCommerce Order Updates</li>
+        <li>COD Orders Dashboard</li>
+        <li>Real-Time Status Tracking</li>
+        <li>Automation Trigger Support</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="callout note">
+    <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 8v5M12 16h.01"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"/>
+    </svg>
+
+    <p>
+      Once a customer confirms or cancels a COD order through WhatsApp,
+      WhatsWay automatically synchronizes the updated status with Shopify or
+      WooCommerce and can trigger additional automation workflows.
+    </p>
+  </div>
+
+</section>
+
+      <section id="automation">
+        <h2 class="h-section"><span class="num">05</span> Automation</h2>
+        <div class="section-rule"></div>
+        <p>Supported automation triggers:</p>
+       <div class="chip-row">
+  <span class="chip">customer_created</span>
+  <span class="chip">order_created</span>
+  <span class="chip">order_updated</span>
+  <span class="chip">abandoned_cart</span>
+  <span class="chip">order_completed</span>
+  <span class="chip">order_cod_pending</span>
+  <span class="chip">order_confirmed</span>
+  <span class="chip">order_cancelled</span>
+  <span class="chip">order_paid</span>
+  <span class="chip">order_fulfilled</span>
+</div>
+        <p style="font-size:14px; color:var(--ink-faint)">Automations can automatically send WhatsApp templates based on these events.</p>
+      </section>
+
+      <section id="api-features">
+        <h2 class="h-section"><span class="num">06</span> API Features</h2>
+        <div class="section-rule"></div>
+
+        <div class="platform-grid">
+          <div class="platform-card">
+            <div class="tag"><span class="dot"></span>Shopify</div>
+            <ul class="clean-list">
+              <li>Connect Store</li>
+              <li>Customer Sync</li>
+              <li>Webhook Integration</li>
+              <li>Order Automation</li>
+              <li>COD Verification</li>
+            </ul>
+          </div>
+          <div class="platform-card">
+            <div class="tag"><span class="dot"></span>WooCommerce</div>
+            <ul class="clean-list">
+              <li>Connect Store</li>
+              <li>Customer Sync</li>
+              <li>Plugin Integration</li>
+              <li>Webhook Receiver</li>
+              <li>COD Verification</li>
+              <li>Order Automation</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="troubleshooting">
+        <h2 class="h-section"><span class="num">07</span> Troubleshooting</h2>
+        <div class="section-rule"></div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Issue</th><th>Solution</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="issue">Store connection failed</td><td>Verify store credentials</td></tr>
+            <tr><td class="issue">Customer not syncing</td><td>Run Sync Now</td></tr>
+            <tr><td class="issue">Webhook not receiving</td><td>Verify plugin configuration</td></tr>
+            <tr><td class="issue">Abandoned cart not created</td><td>Check webhook events</td></tr>
+            <tr><td class="issue">Reminder not sent</td><td>Verify automation and template configuration</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout warn">
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p>Still stuck after checking these? Confirm the WooCommerce Connector Plugin version matches the one downloaded from the Stores page.</p>
+        </div>
+      </section>
+
+      <section id="conclusion">
+        <h2 class="h-section"><span class="num">08</span> Conclusion</h2>
+        <div class="section-rule"></div>
+        <p>The E-Commerce Module enables businesses to automate WhatsApp communication for Shopify and WooCommerce stores with customer synchronization, abandoned cart recovery, order notifications, and COD verification. It includes visual automation, webhook integration, and real-time order synchronization to improve customer engagement and increase conversions.</p>
+      </section>
+
+      <div class="doc-footer-nav">
+        <a href="#overview"><span class="label">Previous</span>Overview</a>
+        <a href="#troubleshooting" style="text-align:right"><span class="label">Next</span>Troubleshooting</a>
+      </div>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-label">On this page</div>
+      <a href="#overview">Overview</a>
+      <a href="#store-connection">Store Connection</a>
+      <a href="#customer-sync">Customer Sync</a>
+      <a href="#abandoned-cart">Abandoned Cart</a>
+      <a href="#automation">Automation</a>
+      <a href="#api-features">API Features</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+      <a href="#conclusion">Conclusion</a>
+    </aside>
+
+  </div>
+
+  <script>
+    const sections = document.querySelectorAll('main section[id]');
+    const navLinks = document.querySelectorAll('.sidebar a.nav-link');
+    const railLinks = document.querySelectorAll('.rail a');
+
+    function setActive(id) {
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      railLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      });
+    }, { rootMargin: '-80px 0px -70% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>
