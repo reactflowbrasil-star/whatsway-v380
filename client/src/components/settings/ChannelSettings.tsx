@@ -384,8 +384,13 @@ export function ChannelSettings() {
   }, [config?.appId]);
 
   const openConnectionChooser = () => {
-    setConnectionFlow("choose");
-    setShowConnectionDialog(true);
+    if (embeddedSignupEnabled) {
+      setConnectionFlow("choose");
+      setShowConnectionDialog(true);
+    } else {
+      setEditingChannel(null);
+      setShowChannelDialog(true);
+    }
   };
 
   const startWhatsAppWeb = async () => {
