@@ -113,7 +113,6 @@ export function ChannelSettings() {
   const [showSuccessGuidance, setShowSuccessGuidance] = useState(false);
   const [lastConnectedCoexistence, setLastConnectedCoexistence] = useState(false);
   const [channelProcessing, setChannelProcessing] = useState<{ status: "processing" | "error"; errorMessage?: string } | null>(null);
-  const [webQr, setWebQr] = useState<{ channelId: string; status: string; qr?: string; error?: string } | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   const { selectedChannel, setSelectedChannel } = useChannelContext();
@@ -390,24 +389,6 @@ export function ChannelSettings() {
     } else {
       setEditingChannel(null);
       setShowChannelDialog(true);
-    }
-  };
-
-  const startWhatsAppWeb = async () => {
-    const channelId = selectedChannel?.id || user?.id;
-    if (!channelId) return;
-    setWebQr({ channelId, status: "connecting" });
-    try {
-      await apiRequest("POST", `/api/whatsapp/web/${channelId}/connect`);
-      const poll = async () => {
-        const response = await fetch(`/api/whatsapp/web/${channelId}/status`, { credentials: "include" });
-        const data = await response.json();
-        setWebQr(data);
-        if (data.status !== "connected" && data.status !== "error") window.setTimeout(poll, 1500);
-      };
-      poll();
-    } catch (error: any) {
-      setWebQr({ channelId, status: "error", error: error.message });
     }
   };
 
@@ -1305,14 +1286,10 @@ export function ChannelSettings() {
                   <Smartphone className="w-5 h-5" />
                   Connect WhatsApp Channel
                 </DialogTitle>
-              <DialogDescription>
-                Choose how you want to connect your WhatsApp number to this platform.
-              </DialogDescription>
+                <DialogDescription>
+                  Choose how you want to connect your WhatsApp number to this platform.
+                </DialogDescription>
               </DialogHeader>
-              <Button variant="outline" className="w-full justify-start gap-3 border-green-300" onClick={startWhatsAppWeb}>
-                <Smartphone className="w-5 h-5 text-green-600" />
-                <span className="text-left"><span className="block font-semibold">Connect with QR Code</span><span className="block text-xs text-muted-foreground">WhatsApp Web session with automatic reconnection</span></span>
-              </Button>
 
               <div className="space-y-3 mt-2">
                 {/* Coexistence Option */}
@@ -1445,16 +1422,6 @@ export function ChannelSettings() {
               </DialogFooter>
             </>
           )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={!!webQr} onOpenChange={(open) => !open && setWebQr(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Conectar WhatsApp por QR Code</DialogTitle><DialogDescription>Abra o WhatsApp no celular, vá em Dispositivos conectados e escaneie o código.</DialogDescription></DialogHeader>
-          <div className="flex min-h-64 items-center justify-center">
-            {webQr?.qr ? <img src={webQr.qr} alt="QR Code do WhatsApp" className="h-64 w-64" /> : <div className="text-center text-sm text-muted-foreground">{webQr?.status === "connected" ? "WhatsApp conectado." : webQr?.error || "Gerando QR Code..."}</div>}
-          </div>
-          <DialogFooter><Button variant="outline" onClick={() => setWebQr(null)}>Fechar</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
