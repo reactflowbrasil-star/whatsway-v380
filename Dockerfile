@@ -29,4 +29,5 @@ COPY --from=build /app/server ./server
 COPY --from=build /app/shared ./shared
 COPY --from=build /app/packages ./packages
 EXPOSE 5000
-CMD ["sh", "-c", "npm run db:push -- --force && npm start"]
+CMD ["npm", "start"]
+
