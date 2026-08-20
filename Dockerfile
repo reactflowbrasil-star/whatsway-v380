@@ -29,7 +29,11 @@ COPY --from=build /app/server ./server
 COPY --from=build /app/shared ./shared
 COPY --from=build /app/packages ./packages
 EXPOSE 5000
-CMD ["tail", "-f", "/dev/null"]
+CMD ["npm", "start"]
+
+
+
+
 
 
 
