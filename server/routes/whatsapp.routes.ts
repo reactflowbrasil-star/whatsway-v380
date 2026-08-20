@@ -25,12 +25,34 @@ import { requireAuth } from "../middlewares/auth.middleware";
 import { requireSubscription } from "../middlewares/requireSubscription";
 import { insertWhatsappChannelSchema } from "@shared/schema";
 import fs from "fs";
+import { connectWhatsAppWeb, disconnectWhatsAppWeb, getWhatsAppWebStatus, sendWhatsAppWeb } from "../services/whatsapp-web.service";
 
 
 
 const WHATSAPP_API_VERSION = process.env.WHATSAPP_API_VERSION || "v25.0";
 
 export function registerWhatsAppRoutes(app: Express) {
+  app.post("/api/whatsapp/web/:id/connect", requireAuth, async (req, res) => {
+    try { res.json(await connectWhatsAppWeb(req.params.id)); }
+    catch (error: any) { res.status(500).json({ message: error.message || "Failed to connect WhatsApp Web" }); }
+  });
+
+  app.get("/api/whatsapp/web/:id/status", requireAuth, (req, res) => {
+    res.json(getWhatsAppWebStatus(req.params.id));
+  });
+
+  app.post("/api/whatsapp/web/:id/disconnect", requireAuth, async (req, res) => {
+    res.json(await disconnectWhatsAppWeb(req.params.id));
+  });
+
+  app.post("/api/whatsapp/web/:id/send", requireAuth, async (req, res) => {
+    try {
+      const { to, message } = req.body;
+      if (!to || !message) return res.status(400).json({ message: "to and message are required" });
+      res.json({ success: true, result: await sendWhatsAppWeb(req.params.id, to, message) });
+    } catch (error: any) { res.status(400).json({ success: false, message: error.message }); }
+  });
+
   // Get all WhatsApp channels
   app.get("/api/whatsapp/channels", requireAuth, async (req, res) => {
     try {
