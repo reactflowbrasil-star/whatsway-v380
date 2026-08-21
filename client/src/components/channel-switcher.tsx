@@ -142,12 +142,17 @@ export function ChannelSwitcher() {
           setShowHealthWarning(true);
         }
 
-        toast({
-          title: "Channel Connection Issue",
-          description: `${safeName}: Token expired or invalid. Please reconnect.`,
-          variant: "destructive",
-          duration: 8000,
-        });
+        // The modal already contains the actionable error details. Showing a
+        // second destructive toast at the same time obscures the settings UI
+        // and makes the same incident look like two separate failures.
+        if (!showModal) {
+          toast({
+            title: "Channel Connection Issue",
+            description: `${safeName}: Token expired or invalid. Please reconnect.`,
+            variant: "destructive",
+            duration: 8000,
+          });
+        }
       }
     } catch (err) {
       if (healthCheckCounter.current !== requestId) return;
@@ -383,7 +388,7 @@ export function ChannelSwitcher() {
               </div>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                 <p className="text-sm text-yellow-800">
-                  <strong>What to do:</strong> Go to Settings and reconnect this channel to refresh the access token.
+                  <strong>What to do:</strong> Reconnect this channel in WhatsApp settings to refresh the access token.
                 </p>
               </div>
             </div>
@@ -399,7 +404,7 @@ export function ChannelSwitcher() {
                   setLocation("/settings?tab=whatsapp");
                 }}
               >
-                Go to Settings
+                Reconnect in Settings
               </Button>
             </div>
           </DialogContent>
