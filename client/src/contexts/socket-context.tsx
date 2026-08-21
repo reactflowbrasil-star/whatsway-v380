@@ -39,7 +39,11 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         userId: user.id,
         role: user.role || "agent",
       },
-      transports: ["polling", "websocket"],
+      // Coolify's reverse proxy currently returns an invalid WebSocket
+      // upgrade frame. Polling is supported by the same Socket.IO server
+      // and keeps QR/status events reliable until proxy WebSocket support is fixed.
+      transports: ["polling"],
+      upgrade: false,
       reconnectionDelay: 2000,
       reconnectionDelayMax: 10000,
     });
