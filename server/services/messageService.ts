@@ -4,6 +4,7 @@ import { AppError } from "../middlewares/error.middleware";
 import { db } from "../db";
 import { contacts as contactsTable, conversations as conversationsTable, messages as messagesTable } from "@shared/schema";
 import { and, eq } from "drizzle-orm";
+import { sendEvolutionText } from "./evolution-go";
 
 
 const WHATSAPP_API_VERSION = process.env.WHATSAPP_API_VERSION || "v25.0";
@@ -42,8 +43,13 @@ export async function sendBusinessMessage({
   let result;
   let sentText = message || "";
 
+  if (channel.connectionMethod === "evolution") {
+    if (!message || templateName) throw new AppError(400, "Evolution GO currently supports text messages in this flow");
+    result = await sendEvolutionText(channel.accessToken, to, message);
+  }
+
   /* ───────── TEMPLATE MESSAGE ───────── */
-  if (templateName) {
+  if (channel.connectionMethod !== "evolution" && templateName) {
     const components: any[] = [];
 
     // HEADER IMAGE
@@ -138,7 +144,7 @@ if (quickReplyPayloads?.length) {
   }
 
   /* ───────── TEXT MESSAGE ───────── */
-  else {
+  else if (channel.connectionMethod !== "evolution") {
     const payload = {
       messaging_product: "whatsapp",
       to: to.replace(/\D/g, ""),

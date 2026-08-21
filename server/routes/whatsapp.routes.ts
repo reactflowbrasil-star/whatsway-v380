@@ -26,6 +26,7 @@ import { requireAuth } from "../middlewares/auth.middleware";
 import { requireSubscription } from "../middlewares/requireSubscription";
 import { insertWhatsappChannelSchema } from "@shared/schema";
 import fs from "fs";
+import { sendEvolutionText } from "../services/evolution-go";
 
 
 
@@ -980,6 +981,15 @@ app.post(
 
       let testPhone = (req.body.phoneNumber || "919310797700").replace(/\D/g, '');
       const testMessage = req.body.message || "Hello! This is a test message from WhatsWay.";
+
+      if (channel.connectionMethod === "evolution") {
+        try {
+          const result = await sendEvolutionText(channel.accessToken, testPhone, testMessage);
+          return res.json({ success: true, message: "Test message sent successfully", result });
+        } catch (error: any) {
+          return res.status(502).json({ success: false, message: error?.message || "Evolution GO send failed" });
+        }
+      }
 
       if (channel.connectionMethod === "qr") {
         const userId = String((req.session as any)?.user?.id || "");
