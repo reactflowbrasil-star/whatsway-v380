@@ -66,12 +66,14 @@ import {
   Loader2,
   Webhook,
   Radio,
+  QrCode,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Channel } from "@shared/schema";
 import { Loading } from "@/components/ui/loading";
 import { ChannelDialog } from "./ChannelDialog";
+import { BaileysQrConnect } from "./BaileysQrConnect";
 import { BusinessProfileEditor } from "./BusinessProfileEditor";
 import { DisplayNameEditor } from "./DisplayNameEditor";
 import { TestMessageDialog } from "./TestMessageDialog";
@@ -87,7 +89,7 @@ declare global {
   }
 }
 
-type ConnectionFlow = "choose" | "eligibility" | "success";
+type ConnectionFlow = "choose" | "qr" | "eligibility" | "success";
 
 export function ChannelSettings() {
   const { t } = useTranslation();
@@ -1321,6 +1323,30 @@ export function ChannelSettings() {
 
                 {/* Standard Option */}
                 <button
+                  onClick={() => setConnectionFlow("qr")}
+                  className="w-full text-left p-4 border-2 border-gray-200 rounded-lg hover:border-emerald-400 hover:bg-emerald-50/50 transition-all group"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                      <QrCode className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-gray-900">Conectar via QR code</h3>
+                        <Badge className="text-[10px] bg-emerald-100 text-emerald-700 border-emerald-200">Baileys</Badge>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">Conecte seu WhatsApp escaneando um QR code, sem configurar credenciais da Meta.</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                        <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Sessão persistente</span>
+                        <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Envio e recebimento</span>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-emerald-500 transition-colors mt-1" />
+                  </div>
+                </button>
+
+                {/* Standard Option */}
+                <button
                   onClick={() => startConnection(false)}
                   className="w-full text-left p-4 border-2 border-gray-200 rounded-lg hover:border-green-400 hover:bg-green-50/50 transition-all group"
                 >
@@ -1346,6 +1372,17 @@ export function ChannelSettings() {
                   </div>
                 </button>
               </div>
+            </>
+          )}
+
+          {connectionFlow === "qr" && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2"><QrCode className="w-5 h-5 text-emerald-600" />Conectar via QR code</DialogTitle>
+                <DialogDescription>Escaneie o código com WhatsApp &gt; Dispositivos conectados.</DialogDescription>
+              </DialogHeader>
+              <BaileysQrConnect />
+              <DialogFooter><Button variant="outline" onClick={() => setConnectionFlow("choose")}>Voltar</Button></DialogFooter>
             </>
           )}
 
