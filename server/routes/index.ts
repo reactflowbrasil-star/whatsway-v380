@@ -63,6 +63,7 @@ import { registerLanguageRoutes } from "./language.routes";
 import { registerClientApiRoutes } from "./client-api.routes";
 import { registerRestApiV1Routes } from "./rest-api-v1.routes";
 import { registerAppUpdateRoutes } from "./app-update.routes";
+import { registerBaileysRoutes } from "./whatsapp-baileys.routes";
 
 export async function registerRoutes(app: Express, existingServer?: Server): Promise<Server> {
   // Auth routes (no authentication required)
@@ -100,6 +101,7 @@ app.use(
   registerConversationRoutes(app);
   registerAutomationRoutes(app);
   registerWhatsAppRoutes(app);
+  registerBaileysRoutes(app);
   registerWhatsappConfigRoutes(app);
   registerWebhookRoutes(app);
   registerMessageRoutes(app);

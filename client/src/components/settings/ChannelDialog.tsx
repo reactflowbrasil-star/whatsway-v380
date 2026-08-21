@@ -15,7 +15,7 @@
  * ============================================================
  */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,6 +45,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Channel } from "@shared/schema";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
+import { BaileysQrConnect } from "./BaileysQrConnect";
 
 const channelFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -69,6 +70,7 @@ interface ChannelDialogProps {
 export function ChannelDialog({ open, onOpenChange, editingChannel, onSuccess }: ChannelDialogProps) {
   const { toast } = useToast();
 const {user} = useAuth()
+  const [connectionMode, setConnectionMode] = useState<"cloud" | "qr">("cloud");
   const channelForm = useForm<z.infer<typeof channelFormSchema>>({
     resolver: zodResolver(channelFormSchema),
     defaultValues: {
@@ -195,6 +197,14 @@ const {user} = useAuth()
             Configure your WhatsApp Business API credentials and settings.
           </DialogDescription>
         </DialogHeader>
+        {!editingChannel && (
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button type="button" variant={connectionMode === "qr" ? "default" : "outline"} onClick={() => setConnectionMode("qr")}>Conectar via QR code</Button>
+            <Button type="button" variant={connectionMode === "cloud" ? "default" : "outline"} onClick={() => setConnectionMode("cloud")}>Usar Meta Cloud API</Button>
+          </div>
+        )}
+        {!editingChannel && connectionMode === "qr" && <BaileysQrConnect />}
+        {connectionMode === "qr" && !editingChannel ? null : (
         <Form {...channelForm}>
           <form onSubmit={channelForm.handleSubmit(handleChannelSubmit)} className="space-y-4">
             <FormField
@@ -331,6 +341,7 @@ const {user} = useAuth()
             </DialogFooter>
           </form>
         </Form>
+        )}
       </DialogContent>
     </Dialog>
   );

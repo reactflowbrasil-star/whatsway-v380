@@ -19,6 +19,7 @@ import type { Express } from "express";
 import { diployLogger, HTTP_STATUS, DIPLOY_BRAND } from "@diploy/core";
 import { storage } from "../storage";
 import { WhatsAppApiService } from "../services/whatsapp-api";
+import { sendBaileysText } from "../services/whatsapp-baileys";
 import { channelHealthMonitor } from "server/cron/channel-health-monitor";
 import { handleDigitalOceanUpload, upload, validateUploadedFiles } from "../middlewares/upload.middleware";
 import { requireAuth } from "../middlewares/auth.middleware";
@@ -593,7 +594,10 @@ if (type === "template") {
     );
 
     // ================= SEND =================
-    const result = await whatsappApi.sendDirectMessage(payload);
+    const userId = String((req.session as any)?.user?.id || "");
+    const result = channel.connectionMethod === "qr"
+      ? await sendBaileysText(userId, to, newMsg)
+      : await whatsappApi.sendDirectMessage(payload);
 
     if (!result || !result.messages) {
       console.error("❌ WhatsApp API error:", result);
