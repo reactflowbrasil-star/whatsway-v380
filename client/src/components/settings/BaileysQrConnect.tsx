@@ -11,7 +11,7 @@ export function BaileysQrConnect() {
   const [phone, setPhone] = useState<string>();
 
   const start = async () => {
-    const response = await apiRequest("POST", "/api/whatsapp/qr/start");
+    const response = await apiRequest("POST", "/api/whatsapp/qr/start?reset=true");
     const result = await response.json();
     setStatus(result.status);
     setQr(result.qr);

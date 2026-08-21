@@ -21,10 +21,14 @@ function emit(userId: string, event: string, payload: unknown) {
   io?.to(`user:${userId}`).emit(event, payload);
 }
 
-export async function startBaileysSession(userId: string) {
+export async function startBaileysSession(userId: string, options: { reset?: boolean } = {}) {
   const existing = sessions.get(userId);
   if (existing?.status === "connecting" || existing?.status === "connected") return existing;
 
+  if (options.reset) {
+    sessions.delete(userId);
+    await fs.rm(sessionDir(userId), { recursive: true, force: true });
+  }
   await fs.mkdir(sessionDir(userId), { recursive: true });
   const { state, saveCreds } = await useMultiFileAuthState(sessionDir(userId));
   const session: Session = { status: "connecting" };
@@ -99,6 +103,13 @@ export async function logoutBaileysSession(userId: string) {
   await session?.socket?.logout().catch(() => undefined);
   sessions.delete(userId);
   emit(userId, "whatsapp:status", { status: "logged_out" });
+}
+
+export async function resetBaileysSession(userId: string) {
+  const session = sessions.get(userId);
+  await session?.socket?.end(undefined);
+  sessions.delete(userId);
+  await fs.rm(sessionDir(userId), { recursive: true, force: true });
 }
 
 export async function sendBaileysText(userId: string, to: string, text: string) {

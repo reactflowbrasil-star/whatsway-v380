@@ -5,7 +5,7 @@ import { getBaileysSession, logoutBaileysSession, startBaileysSession } from "..
 export function registerBaileysRoutes(app: Express) {
   app.post("/api/whatsapp/qr/start", requireAuth, async (req, res) => {
     const userId = String((req.session as any).user.id);
-    const session = await startBaileysSession(userId);
+    const session = await startBaileysSession(userId, { reset: req.query.reset === "true" });
     res.json({ status: session.status, qr: session.qr, phone: session.phone });
   });
   app.get("/api/whatsapp/qr/status", requireAuth, async (req, res) => {
