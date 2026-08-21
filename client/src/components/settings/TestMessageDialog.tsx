@@ -67,10 +67,16 @@ export function TestMessageDialog({ open, onOpenChange, channelId }: TestMessage
       });
       onOpenChange(false);
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      const message = String(error?.message || "");
+      const isInvalidToken =
+        error?.status === 401 ||
+        /invalid oauth|access token|oauth exception/i.test(message);
       toast({
-        title: "Failed to send test message",
-        description: error.message,
+        title: isInvalidToken ? "Reconnect required" : "Failed to send test message",
+        description: isInvalidToken
+          ? "The Meta access token is expired or invalid. Reconnect this channel before sending a test message."
+          : message,
         variant: "destructive",
       });
     },

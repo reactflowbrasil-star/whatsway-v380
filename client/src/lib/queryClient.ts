@@ -67,9 +67,11 @@ async function throwIfResNotOk(res: Response) {
   if (res.ok) return;
 
   let message = "Something went wrong";
+  let responseData: any = undefined;
 
   try {
     const data = await res.json();
+    responseData = data;
 
     if (typeof data?.message === "string") {
       message = data.message;
@@ -80,7 +82,10 @@ async function throwIfResNotOk(res: Response) {
     // ignore JSON parse error
   }
 
-  throw new Error(message);
+  const error = new Error(message) as Error & { status?: number; responseData?: any };
+  error.status = res.status;
+  error.responseData = responseData;
+  throw error;
 }
 
 

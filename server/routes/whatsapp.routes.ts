@@ -850,19 +850,6 @@ app.post(
         return res.status(404).json({ message: "Channel not found" });
       }
 
-      if (channel.connectionMethod === "qr") {
-        const testPhone = (req.body.phoneNumber || "919310797700").replace(/\D/g, "");
-        const testMessage = req.body.message || "Hello! This is a test message from WhatsWay.";
-        const userId = String((req.session as any)?.user?.id || "");
-        const result = await sendBaileysText(userId, testPhone, testMessage);
-        return res.json({ success: true, message: "Test message sent successfully", result });
-      }
-
-      return res.status(410).json({
-        success: false,
-        message: "Teste Meta desativado. Use um canal conectado via QR code.",
-      });
-
       if (!channel.phoneNumberId || !channel.accessToken) {
         return res.status(400).json({
           message: "Channel is not configured for WhatsApp",
@@ -937,7 +924,9 @@ app.post(
       }
 
       if (!channel.phoneNumberId || !channel.accessToken) {
-        return res.status(400).json({ message: "Channel is not configured for WhatsApp" });
+        if (channel.connectionMethod !== "qr") {
+          return res.status(400).json({ message: "Channel is not configured for WhatsApp" });
+        }
       }
 
       const mediaFile = Array.isArray(req.files?.mediaFile)
@@ -991,6 +980,19 @@ app.post(
 
       let testPhone = (req.body.phoneNumber || "919310797700").replace(/\D/g, '');
       const testMessage = req.body.message || "Hello! This is a test message from WhatsWay.";
+
+      if (channel.connectionMethod === "qr") {
+        const userId = String((req.session as any)?.user?.id || "");
+        try {
+          const result = await sendBaileysText(userId, testPhone, testMessage);
+          return res.json({ success: true, message: "Test message sent successfully", result });
+        } catch (error: any) {
+          return res.status(409).json({
+            success: false,
+            message: error?.message || "WhatsApp QR session is not connected",
+          });
+        }
+      }
 
       
 
