@@ -156,8 +156,12 @@ export const getActiveChannel = asyncHandler(async (req: Request, res: Response)
     throw new AppError(404, 'No active channel found');
   }
 
-  // ✅ Messaging limit fetch karo Meta se
-  const messagingLimitInfo = await WhatsAppApiService.fetchMessagingLimit(channel);
+  // QR/Baileys channels do not have Meta credentials. Never make the active
+  // channel endpoint depend on a Cloud API lookup, otherwise every screen
+  // that loads the active channel breaks when Meta is not connected.
+  const messagingLimitInfo = channel.connectionMethod === "qr"
+    ? null
+    : await WhatsAppApiService.fetchMessagingLimit(channel).catch(() => null);
 
   res.json({
     ...channel,
