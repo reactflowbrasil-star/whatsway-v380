@@ -846,6 +846,14 @@ app.post(
         return res.status(404).json({ message: "Channel not found" });
       }
 
+      if (channel.connectionMethod === "qr") {
+        const testPhone = (req.body.phoneNumber || "919310797700").replace(/\D/g, "");
+        const testMessage = req.body.message || "Hello! This is a test message from WhatsWay.";
+        const userId = String((req.session as any)?.user?.id || "");
+        const result = await sendBaileysText(userId, testPhone, testMessage);
+        return res.json({ success: true, message: "Test message sent successfully", result });
+      }
+
       if (!channel.phoneNumberId || !channel.accessToken) {
         return res.status(400).json({
           message: "Channel is not configured for WhatsApp",
