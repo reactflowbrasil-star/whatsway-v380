@@ -595,9 +595,13 @@ if (type === "template") {
 
     // ================= SEND =================
     const userId = String((req.session as any)?.user?.id || "");
-    const result = channel.connectionMethod === "qr"
-      ? await sendBaileysText(userId, to, newMsg)
-      : await whatsappApi.sendDirectMessage(payload);
+    if (channel.connectionMethod !== "qr") {
+      return res.status(410).json({
+        success: false,
+        message: "Este canal usa a antiga WhatsApp Cloud API. Conecte novamente via QR code.",
+      });
+    }
+    const result = await sendBaileysText(userId, to, newMsg);
 
     if (!result || !result.messages) {
       console.error("❌ WhatsApp API error:", result);
@@ -853,6 +857,11 @@ app.post(
         const result = await sendBaileysText(userId, testPhone, testMessage);
         return res.json({ success: true, message: "Test message sent successfully", result });
       }
+
+      return res.status(410).json({
+        success: false,
+        message: "Teste Meta desativado. Use um canal conectado via QR code.",
+      });
 
       if (!channel.phoneNumberId || !channel.accessToken) {
         return res.status(400).json({

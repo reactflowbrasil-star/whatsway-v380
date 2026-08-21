@@ -259,6 +259,10 @@ export async function subscribeChannelToWebhook(channel: {
 
 export const createChannel = asyncHandler(async (req: Request, res: Response) => {
   const validatedChannel = insertChannelSchema.parse(req.body);
+  return res.status(410).json({
+    success: false,
+    message: "A conexão WhatsApp Cloud API foi desativada. Use o QR code para conectar via Baileys.",
+  });
   // 2️⃣ Add creator info 
   const createdBy = (req.session as any).user.id || 'unknown';
   validatedChannel.createdBy = createdBy;
@@ -1642,10 +1646,15 @@ export const getWebhookSubscription = asyncHandler(async (req: Request, res: Res
     const metaData: any = await metaRes.json();
 
     if (!metaRes.ok) {
-      // Meta API error (invalid token, rate limit, etc.) — indeterminate, not confirmed non-subscription
+      // A failed Meta request is not proof that the WABA is unsubscribed.
+      // Keep authentication failures distinct so the UI can direct the user
+      // to reconnect instead of offering a misleading resubscribe action.
+      const metaErrorCode = String(metaData?.error?.code ?? "");
+      const authFailure = metaErrorCode === "190" || metaData?.error?.type === "OAuthException";
       return res.status(502).json({
         subscribed: false,
-        status: "unknown",
+        status: authFailure ? "invalid_token" : "unknown",
+        errorCode: metaData?.error?.code ?? null,
         reason: metaData?.error?.message || "Meta API error",
         raw: metaData,
       });

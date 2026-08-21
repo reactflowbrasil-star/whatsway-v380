@@ -70,7 +70,7 @@ interface ChannelDialogProps {
 export function ChannelDialog({ open, onOpenChange, editingChannel, onSuccess }: ChannelDialogProps) {
   const { toast } = useToast();
 const {user} = useAuth()
-  const [connectionMode, setConnectionMode] = useState<"cloud" | "qr">("cloud");
+  const [connectionMode] = useState<"cloud" | "qr">("qr");
   const channelForm = useForm<z.infer<typeof channelFormSchema>>({
     resolver: zodResolver(channelFormSchema),
     defaultValues: {
@@ -194,15 +194,10 @@ const {user} = useAuth()
         <DialogHeader>
           <DialogTitle>{editingChannel ? "Edit" : "Add New"} WhatsApp Channel</DialogTitle>
           <DialogDescription>
-            Configure your WhatsApp Business API credentials and settings.
+            Conecte seu WhatsApp pelo QR code para usar o canal.
           </DialogDescription>
         </DialogHeader>
-        {!editingChannel && (
-          <div className="grid gap-2 sm:grid-cols-2">
-            <Button type="button" variant={connectionMode === "qr" ? "default" : "outline"} onClick={() => setConnectionMode("qr")}>Conectar via QR code</Button>
-            <Button type="button" variant={connectionMode === "cloud" ? "default" : "outline"} onClick={() => setConnectionMode("cloud")}>Usar Meta Cloud API</Button>
-          </div>
-        )}
+        {!editingChannel && <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">Conexão QR/Baileys ativa. As credenciais da Meta foram removidas deste fluxo.</p>}
         {!editingChannel && connectionMode === "qr" && <BaileysQrConnect />}
         {connectionMode === "qr" && !editingChannel ? null : (
         <Form {...channelForm}>

@@ -98,7 +98,7 @@ export function ChannelSettings() {
   const [showTestDialog, setShowTestDialog] = useState(false);
   const [resubscribingChannelId, setResubscribingChannelId] = useState<string | null>(null);
   const [resubscribingAll, setResubscribingAll] = useState(false);
-  const [webhookSubStatus, setWebhookSubStatus] = useState<Record<string, "subscribed" | "not_subscribed" | "unknown" | "loading">>({});
+  const [webhookSubStatus, setWebhookSubStatus] = useState<Record<string, "subscribed" | "not_subscribed" | "unknown" | "invalid_token" | "loading">>({});
   const [showBusinessProfile, setShowBusinessProfile] = useState(false);
   const [showDisplayNameEditor, setShowDisplayNameEditor] = useState(false);
   const [displayNameChannelId, setDisplayNameChannelId] = useState<string | null>(null);
@@ -261,7 +261,10 @@ export function ChannelSettings() {
       const data = await response.json();
       if (!response.ok) {
         // 502 or other transport errors → unknown (not a definitive non-subscription)
-        setWebhookSubStatus((prev) => ({ ...prev, [channelId]: "unknown" }));
+        setWebhookSubStatus((prev) => ({
+          ...prev,
+          [channelId]: data.status === "invalid_token" ? "invalid_token" : "unknown",
+        }));
       } else {
         setWebhookSubStatus((prev) => ({
           ...prev,
@@ -1090,6 +1093,11 @@ export function ChannelSettings() {
                                 <XCircle className="w-3 h-3" /> Not Subscribed
                               </Badge>
                             )}
+                            {webhookSubStatus[channel.id] === "invalid_token" && (
+                              <Badge variant="secondary" className="text-xs flex items-center gap-1 bg-amber-50 text-amber-700 border-amber-200">
+                                <AlertTriangle className="w-3 h-3" /> Token inválido — reconectar
+                              </Badge>
+                            )}
                             {(webhookSubStatus[channel.id] === "unknown" || !webhookSubStatus[channel.id]) && (
                               <Badge variant="secondary" className="text-xs flex items-center gap-1 bg-gray-50 text-gray-600 border-gray-200">
                                 <AlertTriangle className="w-3 h-3" /> Unknown
@@ -1113,6 +1121,7 @@ export function ChannelSettings() {
                               onClick={() => resubscribeWebhook(channel.id)}
                               disabled={
                                 resubscribingChannelId === channel.id ||
+                                webhookSubStatus[channel.id] === "invalid_token" ||
                                 user?.username === "demouser"
                               }
                               className="text-xs text-green-700 border-green-200 hover:bg-green-50 whitespace-nowrap"
@@ -1130,6 +1139,12 @@ export function ChannelSettings() {
                           <p className="text-xs text-red-600 mt-2 flex items-start gap-1">
                             <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
                             This channel is not subscribed to Meta webhooks. Campaign delivery and read rates will show 0%. Click Re-subscribe to fix this.
+                          </p>
+                        )}
+                        {webhookSubStatus[channel.id] === "invalid_token" && (
+                          <p className="text-xs text-amber-700 mt-2 flex items-start gap-1">
+                            <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                            O token da Meta expirou ou foi revogado. Clique em Reconnect para autorizar novamente; o re-subscribe só funciona depois disso.
                           </p>
                         )}
                         {(webhookSubStatus[channel.id] === "unknown" || !webhookSubStatus[channel.id]) && (
@@ -1294,34 +1309,6 @@ export function ChannelSettings() {
               </DialogHeader>
 
               <div className="space-y-3 mt-2">
-                {/* Coexistence Option */}
-                <button
-                  onClick={() => startConnection(true)}
-                  className="w-full text-left p-4 border-2 border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all group"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-                      <Layers className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-gray-900">Connect Existing WhatsApp Business App</h3>
-                        <Badge className="text-[10px] bg-blue-100 text-blue-700 border-blue-200">Coexistence</Badge>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        Keep using your WhatsApp Business App on your phone while also using this platform for automation, campaigns, and bulk messaging.
-                      </p>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-                        <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Keep mobile app access</span>
-                        <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Sync chat history</span>
-                        <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Same phone number</span>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors mt-1" />
-                  </div>
-                </button>
-
-                {/* Standard Option */}
                 <button
                   onClick={() => setConnectionFlow("qr")}
                   className="w-full text-left p-4 border-2 border-gray-200 rounded-lg hover:border-emerald-400 hover:bg-emerald-50/50 transition-all group"
@@ -1342,33 +1329,6 @@ export function ChannelSettings() {
                       </div>
                     </div>
                     <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-emerald-500 transition-colors mt-1" />
-                  </div>
-                </button>
-
-                {/* Standard Option */}
-                <button
-                  onClick={() => startConnection(false)}
-                  className="w-full text-left p-4 border-2 border-gray-200 rounded-lg hover:border-green-400 hover:bg-green-50/50 transition-all group"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
-                      <Smartphone className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-gray-900">Register New Number</h3>
-                        <Badge className="text-[10px] bg-green-100 text-green-700 border-green-200">Standard</Badge>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        Register a new or existing phone number exclusively for Cloud API use. The number will only work through this platform.
-                      </p>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-                        <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Full API features</span>
-                        <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> No app required</span>
-                        <span className="flex items-center gap-1"><Check className="w-3 h-3 text-green-500" /> Dedicated number</span>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors mt-1" />
                   </div>
                 </button>
               </div>

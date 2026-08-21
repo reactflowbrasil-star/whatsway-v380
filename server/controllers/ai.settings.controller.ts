@@ -19,7 +19,7 @@ import { Request, Response } from "express";
 import { DiployError, asyncHandler as _dHandler, diployLogger, HTTP_STATUS } from "@diploy/core";
 import { db } from "../db";
 import { eq, ne, and, inArray } from "drizzle-orm";
-import { aiSettings } from "@shared/schema";
+import { aiSettings, sites } from "@shared/schema";
 import { storage } from "../storage";
 
 // ---------------------------------------------------------------------------
@@ -325,8 +325,7 @@ export const getAISettingsDiagnostics = async (req: Request, res: Response) => {
       hasApiKey: !!row.apiKey,
       model: row.model ?? null,
       triggerWords,
-      siteId: site?.id || null,
-      siteName: site?.name || null,
+      ...(site ? { siteId: site.id, siteName: site.name } : {}),
       lastSkipReason: row.lastSkipReason ?? null,
       lastSkipAt: row.lastSkipAt ?? null,
     });
