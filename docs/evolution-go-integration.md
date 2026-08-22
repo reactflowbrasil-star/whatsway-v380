@@ -5,7 +5,7 @@ O WhatsWay pode enviar mensagens por uma instância Evolution GO sem usar a Meta
 ## Variáveis do WhatsWay
 
 ```env
-EVOLUTION_GO_URL=http://127.0.0.1:8080
+EVOLUTION_GO_URL=https://evolution.reactfly.run.place
 EVOLUTION_GO_API_KEY=chave-global-ou-token-da-instancia
 ```
 

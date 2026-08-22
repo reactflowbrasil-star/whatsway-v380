@@ -1,4 +1,4 @@
-const baseUrl = () => (process.env.EVOLUTION_GO_URL || "http://127.0.0.1:8080").replace(/\/$/, "");
+const baseUrl = () => (process.env.EVOLUTION_GO_URL || "https://evolution.reactfly.run.place").replace(/\/$/, "");
 
 function apiKey() {
   const key = process.env.EVOLUTION_GO_API_KEY;
